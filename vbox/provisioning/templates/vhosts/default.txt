@@ -1,0 +1,20 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    # For PHP
+    SetEnv APPLICATION_ENV local
+    DocumentRoot /var/www/html
+    # For .htaccess
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+    </Directory>
+    <Directory /var/www/>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+    LogLevel warn
+    #
+    ServerSignature Off
+</VirtualHost>
