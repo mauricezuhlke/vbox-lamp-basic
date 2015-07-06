@@ -104,8 +104,8 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
   db_password = "password123"
 
   ## install mysql # set user & password
-  config.vm.provision "shell", inline: 'echo mysql-server mysql-server/root_password select "#{db_password}" | debconf-set-selections'
-  config.vm.provision "shell", inline: 'echo mysql-server mysql-server/root_password_again select "#{db_password}" | debconf-set-selections'
+  config.vm.provision "shell", inline: 'echo mysql-server mysql-server/root_password select "password123" | debconf-set-selections'
+  config.vm.provision "shell", inline: 'echo mysql-server mysql-server/root_password_again select "password123" | debconf-set-selections'
 
   config.vm.provision :shell do |s|
       s.path = "provisioning/install-package.sh"
@@ -121,10 +121,13 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
   ## enable mcrypt as it's not available initially
   config.vm.provision "shell", inline: "sudo php5enmod mcrypt"
 
+  ## let's create the Piwik db as a start
+  config.vm.provision "shell", inline: "echo 'create database if not exists `piwik_analysis`' | /usr/bin/mysql -u root -ppassword123"
+
  ## Now we'll allow the root user to connect to the db over from anywhere
  ## This is obviouly ONLY FOR LOCAL DEVELOPMENT!!!!!!!!!!
 $db_privilege = <<SCRIPT
-echo /usr/bin/mysql -u root -p#{db_password} -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+echo /usr/bin/mysql -u root -ppassword123 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 SCRIPT
  # config.vm.provision "shell", inline: $db_privilege  
 
