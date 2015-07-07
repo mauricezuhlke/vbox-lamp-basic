@@ -57,7 +57,7 @@ Vagrant.configure(2) do |config|
   # View the documentation for the provider you are using for more
   # information on available options.
 
-  # Map localhost on the Mac so that we get out traffic mapping automatcically 
+  # Map localhost on the Mac so that we get out traffic mapping automatcically
   # ...this does mean we can only have one Vagrant box running using this setup at a time...
   config.trigger.after [:provision, :up, :reload] do
       system('echo "
@@ -79,10 +79,10 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
   ## install system
   config.vm.provision "shell", path: "provisioning/debian-up.sh"
 
-  config.vm.provision :shell do |s|
-      s.path = "provisioning/install-package.sh"
-      s.args = "python-software-properties python software-properties-common"
-  end
+  # config.vm.provision :shell do |s|
+  #     s.path = "provisioning/install-package.sh"
+  #     s.args = "python-software-properties python software-properties-common"
+  # end
 
   ## install apache
   config.vm.provision :shell do |s|
@@ -90,29 +90,25 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
       s.args = "apache2"
   end
 
-  # enable mod-rewrite
-  config.vm.provision "shell", inline: "sudo a2enmod rewrite && sudo service apache2 reload && sudo service apache2 start"
-
-  # set the correct permissions
-  config.vm.provision "shell", inline: "sudo usermod -a -G www-data vagrant && sudo chown -R root:www-data /var/www && sudo chmod 2775 /var/www"
-
-  # ensure the permissions are sticky
-  config.vm.provision "shell", inline: "find /var/www -type d -exec sudo chmod 2775 {} + && find /var/www -type f -exec sudo chmod 0664 {} +"
-
-  
-  # DB Password
-  db_password = "password123"
-
-  ## install mysql # set user & password
-  config.vm.provision "shell", inline: 'echo mysql-server mysql-server/root_password select "password123" | debconf-set-selections'
-  config.vm.provision "shell", inline: 'echo mysql-server mysql-server/root_password_again select "password123" | debconf-set-selections'
-
+  ## Configure and Install the database
   config.vm.provision :shell do |s|
-      s.path = "provisioning/install-package.sh"
-      s.args = "mysql-server-5.5 mysql-client"
+    s.path = "provisioning/database-setup.sh"
+    s.args = ['password123']
   end
 
-   ## install php and php libs
+  # ## Install MySQL
+  # config.vm.provision :shell do |s|
+  #     s.path = "provisioning/install-package.sh"
+  #     s.args = "mysql-server-5.5 mysql-client"
+  # end
+
+  ## Configure the database
+  config.vm.provision :shell do |s|
+    s.path = "provisioning/database-configure.sh"
+    s.args = ['password123', 'piwik_analysis']
+  end
+
+  ## install php and php libs
   config.vm.provision :shell do |s|
       s.path = "provisioning/install-package.sh"
       s.args = "php5 libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-mcrypt php-pear php5-curl php5-common php5-dev php5-json php5-sqlite phpunit"
@@ -121,21 +117,23 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
   ## enable mcrypt as it's not available initially
   config.vm.provision "shell", inline: "sudo php5enmod mcrypt"
 
-  ## let's create the Piwik db as a start
-  config.vm.provision "shell", inline: "echo 'create database if not exists `piwik_analysis`' | /usr/bin/mysql -u root -ppassword123"
 
  ## Now we'll allow the root user to connect to the db over from anywhere
  ## This is obviouly ONLY FOR LOCAL DEVELOPMENT!!!!!!!!!!
 $db_privilege = <<SCRIPT
 echo /usr/bin/mysql -u root -ppassword123 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 SCRIPT
- # config.vm.provision "shell", inline: $db_privilege  
+
+  # config.vm.provision "shell", inline: $db_privilege
+
+  ## Set Apache permissions
+  config.vm.provision "shell", path: "provisioning/apache-setup.sh"
 
   ## Udpate default virtual host and restart Apache
   config.vm.provision "shell", path: "provisioning/install-vhost.sh"
 
   ## lets remove the index.html file that apache creates on install
-  config.vm.provision "shell", inline: "/bin/rm -f /var/www/html/index.html"  
- 
+  config.vm.provision "shell", inline: "/bin/rm -f /var/www/html/index.html"
+
 
 end
