@@ -4,14 +4,14 @@
 
 This server is **NOT FOR PRODUCTION**, it is intended for local use only.
 
-If you deploy this server to a public webserver it **will** get hacked.
+If you deploy this server to a public environment it **will** get hacked.
 
 ---
 
 
 1. Ensure you have Virtual Box [installed](https://www.virtualbox.org/wiki/Downloads "Download Virtual Box")
 2. Ensure you have Vagrant [installed](https://www.vagrantup.com "Install Vagrant")
-3. Install the Vagrant Triggers plugin ```[vagrant plugin install vagrant-triggers```
+3. Install the Vagrant Triggers plugin ```vagrant plugin install vagrant-triggers```
 4. cd to the ```vbox-lamp-basic``` folder
 5. Type ```vagrant up```
 6. Wait until the cli is done rushing past your eyes
