@@ -1,5 +1,5 @@
 .DS_Store
-vbox/.vagrant/
-www/piwik/tmp/
-www/piwik/tests/
+vbox/.vagrant/**
+www/piwik/tmp/**
+www/piwik/tests/**
 www/piwik/config/config.ini.php
