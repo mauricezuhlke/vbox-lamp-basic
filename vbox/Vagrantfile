@@ -90,22 +90,18 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
       s.args = "apache2"
   end
 
+  $db_password = 'password123'
+
   ## Configure and Install the database
   config.vm.provision :shell do |s|
     s.path = "provisioning/database-setup.sh"
-    s.args = ['password123']
+    s.args = [$db_password]
   end
-
-  # ## Install MySQL
-  # config.vm.provision :shell do |s|
-  #     s.path = "provisioning/install-package.sh"
-  #     s.args = "mysql-server-5.5 mysql-client"
-  # end
 
   ## Configure the database
   config.vm.provision :shell do |s|
     s.path = "provisioning/database-configure.sh"
-    s.args = ['password123', 'piwik_analysis']
+    s.args = [$db_password, 'owa_analysis']
   end
 
   ## install php and php libs
@@ -121,7 +117,7 @@ rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 
  ## Now we'll allow the root user to connect to the db over from anywhere
  ## This is obviouly ONLY FOR LOCAL DEVELOPMENT!!!!!!!!!!
 $db_privilege = <<SCRIPT
-echo /usr/bin/mysql -u root -ppassword123 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+echo /usr/bin/mysql -u root -p$db_password -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 SCRIPT
 
   # config.vm.provision "shell", inline: $db_privilege
