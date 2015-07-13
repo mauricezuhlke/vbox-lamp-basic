@@ -21,6 +21,6 @@ If you deploy this server to a public environment it **will** get hacked.
 5. Type ```vagrant up```
 6. Wait until the cli is done rushing past your eyes
 7. Visit: http://[made-up-domain].com in your fave browser
-8. To install Open Web Analytics
+8. To install [Open Web Analytics](https://github.com/padams/Open-Web-Analytics/wiki/Installation "Install OWA")
 	9. http://[made-up-domain].com/owa in your web browser
 	10. Follow the installation instructions with the database user as _root_ and password as _password123_
